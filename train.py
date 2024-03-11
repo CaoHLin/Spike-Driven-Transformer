@@ -1187,7 +1187,7 @@ def main():
             batch_size=args.batch_size,
             repeats=args.epoch_repeats,
             transform=transforms_train,
-            # download=True,
+            download=True,
         )
         dataset_eval = create_dataset(
             args.dataset,
@@ -1196,7 +1196,7 @@ def main():
             is_training=False,
             batch_size=args.batch_size,
             transform=transforms_eval,
-            # download=True,
+            download=True,
         )
 
     # setup mixup / cutmix

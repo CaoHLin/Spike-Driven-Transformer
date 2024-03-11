@@ -4,7 +4,7 @@ from spikingjelly.clock_driven.neuron import (
     MultiStepLIFNode,
     MultiStepParametricLIFNode,
 )
-
+from .quantized_utils import IRConv2d
 
 class Erode(nn.Module):
     def __init__(self) -> None:
@@ -31,7 +31,8 @@ class MS_MLP_Conv(nn.Module):
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.res = in_features == hidden_features
-        self.fc1_conv = nn.Conv2d(in_features, hidden_features, kernel_size=1, stride=1)
+#         self.fc1_conv = nn.Conv2d(in_features, hidden_features, kernel_size=1, stride=1)
+        self.fc1_conv = IRConv2d(in_features, hidden_features, kernel_size=1, stride=1)
         self.fc1_bn = nn.BatchNorm2d(hidden_features)
         if spike_mode == "lif":
             self.fc1_lif = MultiStepLIFNode(tau=2.0, detach_reset=True, backend="cupy")
@@ -40,7 +41,10 @@ class MS_MLP_Conv(nn.Module):
                 init_tau=2.0, detach_reset=True, backend="cupy"
             )
 
-        self.fc2_conv = nn.Conv2d(
+#         self.fc2_conv = nn.Conv2d(
+#             hidden_features, out_features, kernel_size=1, stride=1
+#         )
+        self.fc2_conv = IRConv2d(
             hidden_features, out_features, kernel_size=1, stride=1
         )
         self.fc2_bn = nn.BatchNorm2d(out_features)
@@ -102,7 +106,8 @@ class MS_SSA_Conv(nn.Module):
         if dvs:
             self.pool = Erode()
         self.scale = 0.125
-        self.q_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+#         self.q_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+        self.q_conv = IRConv2d(dim, dim, kernel_size=1, stride=1, bias=False)
         self.q_bn = nn.BatchNorm2d(dim)
         if spike_mode == "lif":
             self.q_lif = MultiStepLIFNode(tau=2.0, detach_reset=True, backend="cupy")
@@ -111,7 +116,8 @@ class MS_SSA_Conv(nn.Module):
                 init_tau=2.0, detach_reset=True, backend="cupy"
             )
 
-        self.k_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+#         self.k_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+        self.k_conv = IRConv2d(dim, dim, kernel_size=1, stride=1, bias=False)
         self.k_bn = nn.BatchNorm2d(dim)
         if spike_mode == "lif":
             self.k_lif = MultiStepLIFNode(tau=2.0, detach_reset=True, backend="cupy")
@@ -120,7 +126,8 @@ class MS_SSA_Conv(nn.Module):
                 init_tau=2.0, detach_reset=True, backend="cupy"
             )
 
-        self.v_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+#         self.v_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1, bias=False)
+        self.v_conv = IRConv2d(dim, dim, kernel_size=1, stride=1, bias=False)
         self.v_bn = nn.BatchNorm2d(dim)
         if spike_mode == "lif":
             self.v_lif = MultiStepLIFNode(tau=2.0, detach_reset=True, backend="cupy")
@@ -150,7 +157,8 @@ class MS_SSA_Conv(nn.Module):
                 init_tau=2.0, v_threshold=0.5, detach_reset=True, backend="cupy"
             )
 
-        self.proj_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1)
+#         self.proj_conv = nn.Conv2d(dim, dim, kernel_size=1, stride=1)
+        self.proj_conv = IRConv2d(dim, dim, kernel_size=1, stride=1)
         self.proj_bn = nn.BatchNorm2d(dim)
 
         if spike_mode == "lif":

@@ -5,7 +5,7 @@ from spikingjelly.clock_driven.neuron import (
     MultiStepParametricLIFNode,
 )
 from timm.models.layers import to_2tuple
-
+from .quantized_utils import IRConv2d
 
 class MS_SPS(nn.Module):
     def __init__(
@@ -44,7 +44,15 @@ class MS_SPS(nn.Module):
             kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False
         )
 
-        self.proj_conv1 = nn.Conv2d(
+#         self.proj_conv1 = nn.Conv2d(
+#             embed_dims // 8,
+#             embed_dims // 4,
+#             kernel_size=3,
+#             stride=1,
+#             padding=1,
+#             bias=False,
+#         )
+        self.proj_conv1 = IRConv2d(
             embed_dims // 8,
             embed_dims // 4,
             kernel_size=3,
@@ -65,14 +73,22 @@ class MS_SPS(nn.Module):
             kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False
         )
 
-        self.proj_conv2 = nn.Conv2d(
+#         self.proj_conv2 = nn.Conv2d(
+#             embed_dims // 4,
+#             embed_dims // 2,
+#             kernel_size=3,
+#             stride=1,
+#             padding=1,
+#             bias=False,
+#         )
+        self.proj_conv2 = IRConv2d(
             embed_dims // 4,
             embed_dims // 2,
             kernel_size=3,
             stride=1,
             padding=1,
             bias=False,
-        )
+        )       
         self.proj_bn2 = nn.BatchNorm2d(embed_dims // 2)
         if spike_mode == "lif":
             self.proj_lif2 = MultiStepLIFNode(
@@ -86,7 +102,10 @@ class MS_SPS(nn.Module):
             kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False
         )
 
-        self.proj_conv3 = nn.Conv2d(
+#         self.proj_conv3 = nn.Conv2d(
+#             embed_dims // 2, embed_dims, kernel_size=3, stride=1, padding=1, bias=False
+#         )
+        self.proj_conv3 = IRConv2d(
             embed_dims // 2, embed_dims, kernel_size=3, stride=1, padding=1, bias=False
         )
         self.proj_bn3 = nn.BatchNorm2d(embed_dims)
@@ -102,7 +121,10 @@ class MS_SPS(nn.Module):
             kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False
         )
 
-        self.rpe_conv = nn.Conv2d(
+#         self.rpe_conv = nn.Conv2d(
+#             embed_dims, embed_dims, kernel_size=3, stride=1, padding=1, bias=False
+#         )
+        self.rpe_conv = IRConv2d(
             embed_dims, embed_dims, kernel_size=3, stride=1, padding=1, bias=False
         )
         self.rpe_bn = nn.BatchNorm2d(embed_dims)
